@@ -1,0 +1,49 @@
+name: Exam checks
+
+# Runs on pull requests into v2026-base — i.e. each group's exam-feature PR.
+# Tools come from uv.lock (pinned), so results match the course release, not
+# whatever the latest ruff/pyright happens to be.
+
+on:
+  pull_request:
+    branches: [v2026-base]
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  checks:
+    name: ruff / pyright / tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install uv (with cache)
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Sync dependencies
+        run: uv sync --all-extras
+
+      - name: Ruff lint
+        run: uv run ruff check .
+
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+      - name: Pyright (type check)
+        run: uv run pyright
+
+      - name: Tests (your group's tests in tests/exam/)
+        run: uv run pytest tests/exam
