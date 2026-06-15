@@ -1,12 +1,12 @@
 name: Exam checks
 
-# Runs on pull requests into v2026-base — i.e. each group's exam-feature PR.
+# Runs on pull requests into main — i.e. each group's exam-feature PR.
 # uv provisions Python and installs the lockfile-pinned tools, so results match
 # the course release (not whatever the latest ruff/pyright happens to be).
 
 on:
   pull_request:
-    branches: [v2026-base]
+    branches: [main]
 
 jobs:
   checks:
