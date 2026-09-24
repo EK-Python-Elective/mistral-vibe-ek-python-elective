@@ -155,6 +155,14 @@ def parse_arguments() -> argparse.Namespace:
         "persisted to trusted_folders.toml). Skips the trust prompt. "
         "Use this for non-interactive automation.",
     )
+    # NYT (session 4): --info flag.
+    # action="store_true" betyder: skriver man --info, bliver args.info = True,
+    # ellers False. Flaget tager ingen værdi.
+    parser.add_argument(
+        "--info",
+        action="store_true",
+        help="Print Vibe version, Python version and working directory, then exit.",
+    )
 
     # Feature flag for teleport, not exposed to the user yet
     parser.add_argument("--teleport", action="store_true", help=argparse.SUPPRESS)
@@ -269,6 +277,18 @@ def main() -> None:
         return
 
     args = parse_arguments()
+
+    # NYT (session 4): håndter --info.
+    # Tjekkes lige efter parsing og før tung opsætning (logging, config, TUI),
+    # så kommandoen er hurtig. Printer info og stopper programmet med return.
+    if args.info:
+        import platform
+
+        print(f"Vibe version:  {__version__}")
+        print(f"Python:        {platform.python_version()}")
+        print(f"Working dir:   {Path.cwd()}")
+        return
+
     worktree_session: PreparedWorktree | None = None
 
     from rich import print as rprint
